@@ -1,3 +1,7 @@
+---
+author: "Jasmine Lantaca"
+---
+
 In this lab, we will be using the `dplyr` package to explore student evaluations
 of teaching data. 
 
@@ -139,7 +143,7 @@ included in the `teacher_evals_codebook.pdf`.
 ```{r}
 #| label: setup
 # code chunk for loading packages
-
+library(tidyverse)
 ```
 
 **2. Load in the `teacher_evals` data.** 
@@ -148,6 +152,7 @@ included in the `teacher_evals_codebook.pdf`.
 #| label: load-data
 # code chunk for importing the data
 
+evals <- read_csv("Data/Data-Raw/teacher_evals.csv")
 ```
 
 ### Data Inspection + Summary
