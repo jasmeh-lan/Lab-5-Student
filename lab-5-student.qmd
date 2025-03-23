@@ -1,5 +1,6 @@
 ---
 author: "Jasmine Lantaca"
+format: gfm
 ---
 
 In this lab, we will be using the `dplyr` package to explore student evaluations
