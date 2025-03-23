@@ -210,9 +210,12 @@ write_csv(evals_clean, "Data/Data-Clean/teacher_evals_clean.csv")
 #| label: unique-courses
 # code chunk for Q5
 
+
 n_distinct(evals_clean$course_id) #number of unique courses
 n_distinct(evals_clean$teacher_id) # number of teachers
 ```
+
+> There are 921 unique courses while 294 teachers.
 
 **7. One teacher-course combination has some missing values, coded as `NA`. Which instructor has these missing values? Which course? What variable are the missing values in?**
 
@@ -220,7 +223,12 @@ n_distinct(evals_clean$teacher_id) # number of teachers
 #| label: uncovering-missing-values
 # code chunk for Q6
 
+evals_clean |>
+  filter(if_any(.col = everything(), is.na))
+
 ```
+
+> The teacher-course combination that has missing value is course PAB3SE004PA and teacher	56347. The variable that is missing is the percentage failed in the current semester.
 
 **8. What are the demographics of the instructors in this study? Investigate the variables `academic_degree`, `seniority`, and `sex` and summarize your findings in ~3 complete sentences.**
 
@@ -228,7 +236,22 @@ n_distinct(evals_clean$teacher_id) # number of teachers
 #| label: exploring-demographics-of-instructors
 # code chunk for Q7
 
+evals_clean |>
+  select(sex, seniority, academic_degree) |>
+  count(sex)
+
+evals_clean |>
+  select(sex, seniority, academic_degree) |>
+  count(seniority) |>
+  arrange(desc(n))
+
+evals_clean |>
+  select(sex, seniority, academic_degree) |>
+  count(academic_degree)
+
 ```
+
+> Looking at the demographics of the instructors, there are more males (3464) than female (3199) professors/teaching staffs. Majority of the professors have been working in the university at least 2 years. the second closest majority senority is 6 years, and third cloest majority is 8 years; this data shows that majority of teaching staffs are people with decent years of teaching in the university. In terms of academic degree, majority of teachers hold a doctorate degree compared to the rest.
 
 **9. Each course seems to have used a different subset of the nine evaluation questions. How many teacher-course combinations asked all nine questions?**
 
@@ -236,7 +259,13 @@ n_distinct(evals_clean$teacher_id) # number of teachers
 #| label: teacher-course-asked-every-question
 # code chunk for Q8
 
+evals_clean |>
+  count(course_id, teacher_id) |> 
+  filter(n == 9)
+
 ```
+
+> There are 48 teacher-course combinations that asked all nine questions.
 
 ## Rate my Professor
 
@@ -246,7 +275,21 @@ n_distinct(evals_clean$teacher_id) # number of teachers
 #| label: question-1-high-low
 # code chunk for Q9
 
+evals_clean |>
+  filter(question_no == 901) |>
+  arrange(SET_score_avg) |>
+  select(teacher_id, SET_score_avg) |>
+  slice_min(SET_score_avg) # looking at instructors with the lowest SET score average
+
+evals_clean |>
+  filter(question_no == 901) |>
+  arrange(SET_score_avg) |>
+  select(teacher_id, SET_score_avg) |>
+  slice_max(SET_score_avg) # looking at instructors with the highest SET score average
+
 ```
+
+> The instructors that have the lowest SET score average for question 1 are 	100132, 3577,	40937, 37035,	54201, and 37011 while the instructores there are 361 teachers that have the highest SET score average for quesstion 1(ex: 40903, 84689, 38238, 38335, etc).
 
 **11. Which instructors with one year of experience had the highest and lowest average percentage of students failing in the current semester across all their courses?**
 
@@ -254,7 +297,23 @@ n_distinct(evals_clean$teacher_id) # number of teachers
 #| label: one-year-experience-failing-students
 # code chunk for Q10
 
+evals_clean |>
+  filter(seniority == 1) |>
+  count(teacher_id, percent_failed_cur) |>
+  select(teacher_id, percent_failed_cur) |>
+  arrange(percent_failed_cur) |>
+  slice_min(percent_failed_cur) # the instructors that have the lowest average percent of students failing in current semester
+
+evals_clean |>
+  filter(seniority == 1) |>
+  count(teacher_id, percent_failed_cur) |>
+  select(teacher_id, percent_failed_cur) |>
+  arrange(percent_failed_cur) |>
+  slice_max(percent_failed_cur) # the instructors that have the highest average percent of students failing in current semester
+
 ```
+
+> There are 9 instructors with the lowest average percentage of student's failing in the currect semester and they are 80974, 84688, 84689, 86222, 98650, 98651, 102379, 103092, and 106126. There is one instructure with the highest average percentage of student's failing in the current semester and they are 104362.
 
 **12. Which female instructors with either a doctorate or professional degree had the highest and lowest average percent of students responding to the evaluation across all their courses?**
 
@@ -262,4 +321,20 @@ n_distinct(evals_clean$teacher_id) # number of teachers
 #| label: female-instructor-student-response
 # code chunk for Q11
 
+evals_clean |>
+  filter(sex == "female" & academic_degree == "dr" | sex == "female" & academic_degree == "prof") |>
+  arrange(resp_share) |>
+  count(teacher_id, resp_share) |>
+  select(teacher_id, resp_share) |>
+  slice_min(resp_share) # looking at which female instructor who's either a dr or prof degree that has the lowest average in student responding
+
+evals_clean |>
+  filter(sex == "female" & academic_degree == "dr" | sex == "female" & academic_degree == "prof") |>
+  arrange(resp_share) |>
+  count(teacher_id, resp_share) |>
+  select(teacher_id, resp_share) |>
+  slice_max(resp_share) # looking at which female instructor who's either a dr or prof degree that has the highest average in student responding
+
 ```
+
+> The female instructor with either a doctorate or professor degree that has the lowest average percent of student's responding is 3485 while the female instructor with the highest average percentage of student's repsonding with the same conditions is 101508.
