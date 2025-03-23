@@ -163,7 +163,10 @@ evals <- read_csv("Data/Data-Raw/teacher_evals.csv")
 #| label: explore-data
 # you may want to use code to answer this question
 
+glimpse(evals)
+dim(evals)
 ```
+> There is a total of 8015 rows of data with 22 columns. The data is collected from students at Universirty of Poland from all sorts of courses and studies offered by the university whose rating the teaching staff of based on 9 question with answers from 1 to 5. Other data information includes the time of day with day of the week and class duration of the course the teacher teach, the gender of teacher, the degree and senority of the teacher, and data fo the students like average grade/standard deviation, and percentage of failed students. 
 
 **4. What is the unit of observation (i.e. a single row in the dataset) identified by?**
 
@@ -171,7 +174,10 @@ evals <- read_csv("Data/Data-Raw/teacher_evals.csv")
 #| label: row-identification
 # you may want to use code to answer this question
 
+summary(evals)
 ```
+
+> In a single observation, the data consist of 22 elements: course id, teacher id, the type of question answered, the total number of participants for teacher/course, proportion of survey response to the all, evaluation average of teacher, grade average of student in teacher class of both the past semesters and current semester, the standard deviation of student grade in teacher class for both current semester and past semesters, teacher's degree, senority, gender, course information (time of day, day of the week, duration of class), and percentage of student's failed in both past and current semester.
 
 **5. Use _one_ `dplyr` pipeline to clean the data by:**
 
@@ -186,6 +192,16 @@ evals <- read_csv("Data/Data-Raw/teacher_evals.csv")
 #| label: data-cleaning
 # code chunk for Q4
 
+evals_clean <- evals |>
+  rename(sex = gender) |>
+  filter(no_participants > 10) |>
+  mutate(across(c(teacher_id, question_no), as.factor)) |>
+  select(c(course_id, teacher_id, question_no, no_participants, resp_share, SET_score_avg, percent_failed_cur, academic_degree, seniority, sex))
+  
+
+glimpse(evals_clean)
+
+write_csv(evals_clean, "Data/Data-Clean/teacher_evals_clean.csv")
 ```
 
 **6. How many unique instructors and unique courses are present in the cleaned dataset?**
@@ -194,6 +210,8 @@ evals <- read_csv("Data/Data-Raw/teacher_evals.csv")
 #| label: unique-courses
 # code chunk for Q5
 
+n_distinct(evals_clean$course_id) #number of unique courses
+n_distinct(evals_clean$teacher_id) # number of teachers
 ```
 
 **7. One teacher-course combination has some missing values, coded as `NA`. Which instructor has these missing values? Which course? What variable are the missing values in?**
